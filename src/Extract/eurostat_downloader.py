@@ -2,6 +2,7 @@ import eurostat_client as eurostat_client
 import file_manager as file_manager
 from dateutil import parser
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -81,17 +82,42 @@ class EurostatDownloader:
             raise
 
     def perform_download(self, last_update_date):
-        logger.info(f"Downloading data ...")
-        try:
-            eu_stream_download = self.eus_client.download_stream()
-            # Save the file
-            self.file_manager.save_file(eu_stream_download)
-            # Only if saving succeeded, we save the new date
-            self.file_manager.save_last_download_date(last_update_date)
+        logger.info("Downloading data ...")
 
-        except Exception as e:
-            logger.exception(f"Error during perform_download for dataset: {self.dataset_name}")
-            raise
+        for attempt in range(1, 4):
+            try:
+                logger.info(
+                    "Download attempt %s/3 for %s",
+                    attempt,
+                    self.dataset_name,
+                )
+
+                response = self.eus_client.download_stream()
+                self.file_manager.save_file(response)
+                break
+
+            except Exception as e:
+                logger.warning(
+                    "Download attempt %s failed for %s",
+                    attempt,
+                    self.dataset_name,
+                )
+
+                if attempt == 3:
+                    logger.exception("All download attempts failed")
+                    raise ConnectionError(
+                        f"Failed to download {self.dataset_name} after 3 attempts"
+                    ) from e
+
+                time.sleep(2 * attempt)
+
+        # Save the Eurostat update date only after the data file is verified
+        if last_update_date:
+            self.file_manager.save_last_download_date(last_update_date)
+        else:
+            logger.warning(
+                "Data downloaded, but Eurostat update date is unavailable. "
+            )
 
     def run(self):
         return self.download_dataset()

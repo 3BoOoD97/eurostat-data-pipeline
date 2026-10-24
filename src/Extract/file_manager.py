@@ -1,5 +1,7 @@
 import os
 import logging
+import gzip
+
 
 logger = logging.getLogger(__name__)
 
@@ -26,24 +28,40 @@ class FileManager:
 
     # This function saves the stream coming from Eurostat locally as a .gz file.
     def save_file(self, stream):
+        temp_path = self.output_gz_data_path + ".part"
+
         try:
-            # Prepare the file to write the data in binary access mode
-            with open(self.output_gz_data_path, "wb") as f:
-                # Start the download process, as chunks, each one has a size of 1MB
+        # Download to a temporary file first
+            with open(temp_path, "wb") as f:
                 for chunk in stream.iter_content(chunk_size=1024 * 1024):
                     if chunk:
                         f.write(chunk)
-            logger.info(f"Raw data file saved: {self.output_gz_data_path}")
 
-        # Catch general exceptions
+            # Reject empty downloads
+            if not os.path.exists(temp_path) or os.path.getsize(temp_path) == 0:
+                raise ValueError("Downloaded data file is empty")
+
+            # Validate the complete GZIP file
+            with gzip.open(temp_path, "rb") as gz:
+                while gz.read(1024 * 1024):
+                    pass
+
+            # Replace the existing file only after successful validation
+            os.replace(temp_path, self.output_gz_data_path)
+
+            logger.info(f"Raw data file saved and verified: {self.output_gz_data_path}")
+
         except Exception as e:
-            raise IOError(f"Error saving file: {e}")
-        # Make sure the data file exists locally
-        if not self.data_file_exists():
-            raise FileNotFoundError("Data file was not created")
-        # Make sure the data file is not empty
-        if self.get_data_file_size_mb() == 0:
-            raise ValueError("Downloaded data file is empty")
+            if os.path.exists(temp_path):
+                try:
+                    os.remove(temp_path)
+                except OSError:
+                    logger.exception("Failed to remove temporary download file")
+
+            raise IOError(f"Download failed or file validation failed: {e}") from e
+
+        finally:
+            stream.close()
 
     # This function returns the size of the local data file in MB if it exists
     def get_data_file_size_mb(self):

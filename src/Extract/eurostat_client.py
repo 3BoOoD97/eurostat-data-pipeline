@@ -69,18 +69,10 @@ class EurostatClient:
 
     # Attempting to download the Dataset data from Eurostat as a stream
     def download_stream(self):
-        # Try connection for 3 times
-        for i in range(3):
-            try:
-                # Downloads the data in chunks instead of loading the whole file into memory.
-                response = requests.get(self.data_url, stream=True, timeout=120)
-                # Check what kind of res we got and return it if it was 2xx otherwise throw exception
-                response.raise_for_status()
-                return response
-            # Catch errors while trying to download the data
-            except Exception as e:
-                logger.warning(f" Download attempt: {i + 1} Failed {e}")
-                # Sleep 2 sec to give the server a better chance
-                time.sleep(2)
-        # If the connection failed in the 3 times throw an exception
-        raise ConnectionError("Data loading failed!")
+        response = requests.get(
+            self.data_url,
+            stream=True,
+            timeout=(10, 120),
+        )
+        response.raise_for_status()
+        return response
