@@ -7,49 +7,93 @@ from airflow.providers.standard.operators.bash import BashOperator
 
 OUTPUT_PATH = os.getenv(
     "EUROSTAT_OUTPUT_VOLUME",
-    "/run/desktop/mnt/host/c/Users/Hp/Desktop/THESIS/CODE/output:/app/output"
+    "/run/desktop/mnt/host/c/Users/Hp/Desktop/eurostat-data-pipeline/output:/app/output"
 )
 
+OUTPUT_DIR = "/opt/airflow/output"
 
-# Dataset configuration dictionary
+
 DATASETS_CONFIG = {
-    "migr_asyappctzm": { # Monthly data about asylum applicants
-        "schedule": "0 0 1,15 * *",  # Run on day 1 and 15 each month
+    "migr_asyappctzm": { 
+        "schedule": "0 0 1,15 * *",
         "description": "Monthly Asylum Applications",
         "tags": ["eurostat", "monthly", "asylum"]
     },
-    "migr_asyappctza": {  # Annual data about asylum applicants
-        "schedule": "0 0 1 * *",  # Run every first day of each month
-        "description": "Annual Asylum Applications",
-        "tags": ["eurostat", "annual", "asylum"]
+    "migr_asypenctzm": { 
+        "schedule": "0 0 1,15 * *",
+        "description": "Monthly Pending Asylum Applications",
+        "tags": ["eurostat", "monthly", "asylum"]
     },
-    "migr_asydcfsta": { # Asylum decisions by citizenship, age, sex, and decision type.
-        "schedule": "0 0 1 * *",  # Run every first day of each month
-        "description": "Decisions",
-        "tags": ["eurostat", "decisions", "asylum"]
-    },
-    "migr_asyapp1mp": { # Asylum applicants per 1,000 inhabitants
-        "schedule": "0 0 1 * *",  # Run every first day of each month
-        "description": "First-time asylum applicants per 1000",
-        "tags": ["eurostat", "annual", "indicator"]
+    "migr_asydcfstq": { 
+        "schedule": "0 0 1 * *",
+        "description": "Quarterly Asylum Decisions",
+        "tags": ["eurostat", "quarterly", "asylum"]
     }
 }
 
-# Function to check if the data needs update or not
-def decide_if_transform (dataset_name, **kwargs):
-    ti = kwargs["ti"]
-    # Pull the last line of the output command
-    status = (ti.xcom_pull(task_ids="extract_pipeline") or "").strip()
 
-    processed_parquet = f"/opt/airflow/output/processed/{dataset_name}_processed.parquet"
-    processed_csv = f"/opt/airflow/output/processed/{dataset_name}_processed.csv"
+def read_update_date(file_path):
+    if not os.path.isfile(file_path):
+        return None
+
+    with open(file_path, "r", encoding="utf-8") as file:
+        date_value = file.read().strip()
+
+    if not date_value or date_value.lower() in {"none", "null"}:
+        return None
+
+    return date_value
+
+
+# Function to check if the data needs update or not
+def decide_if_transform(dataset_name, **kwargs):
+    ti = kwargs["ti"]
+
+    # Pull the last line of the output command
+    status_output = ti.xcom_pull(task_ids="extract_pipeline")
+    status_lines = str(status_output or "").strip().splitlines()
+    status = status_lines[-1].strip() if status_lines else ""
+
+    processed_parquet = os.path.join(
+        OUTPUT_DIR,
+        "processed",
+        f"{dataset_name}_chunked_processed.parquet",
+    )
 
     if status == "UPDATED=true":
-        return 'transform_pipeline'
-    if not os.path.exists(processed_csv) or not os.path.exists(processed_parquet):
-        return 'transform_pipeline'
-    else:
-        return 'skip_transform'
+        return "transform_pipeline"
+
+    if status != "UPDATED=false":
+        raise ValueError(
+            f"Unexpected extraction status for {dataset_name}: {status!r}"
+        )
+
+    if (
+        not os.path.isfile(processed_parquet)
+        or os.path.getsize(processed_parquet) == 0
+    ):
+        return "transform_pipeline"
+
+    downloaded_date = read_update_date(
+        os.path.join(
+            OUTPUT_DIR,
+            "last_download_date",
+            f"{dataset_name}.txt",
+        )
+    )
+
+    processed_date = read_update_date(
+        os.path.join(
+            OUTPUT_DIR,
+            "last_processed_date",
+            f"{dataset_name}.txt",
+        )
+    )
+
+    if not downloaded_date or downloaded_date != processed_date:
+        return "transform_pipeline"
+
+    return "skip_transform"
 
 
 DEFAULT_ARGS = {
@@ -57,6 +101,7 @@ DEFAULT_ARGS = {
     "retries": 2,
     "retry_delay": timedelta(minutes=5),
 }
+
 
 # Loop through all datasets in the configuration dictionary
 for dataset_name, config in DATASETS_CONFIG.items():
@@ -71,16 +116,21 @@ for dataset_name, config in DATASETS_CONFIG.items():
             description=config["description"],
     ) as dag:
 
-
         extract_pipeline = BashOperator(
             task_id="extract_pipeline",
-            bash_command=f"docker run --rm -v {OUTPUT_PATH} eurostat-extract {dataset_name}",
+            bash_command=(
+                f'docker run --rm -v "{OUTPUT_PATH}" '
+                f"eurostat-extract {dataset_name}"
+            ),
             do_xcom_push=True, # To save the last line of the output to xcom
         )
 
         transform_pipeline = BashOperator(
             task_id="transform_pipeline",
-            bash_command=f"docker run --rm -v {OUTPUT_PATH} eurostat-transform {dataset_name}",
+            bash_command=(
+                f'docker run --rm -v "{OUTPUT_PATH}" '
+                f"eurostat-transform {dataset_name}"
+            ),
         )
 
         skip_transform = EmptyOperator(
@@ -93,7 +143,9 @@ for dataset_name, config in DATASETS_CONFIG.items():
             python_callable=decide_if_transform,
         )
 
-        extract_pipeline >> check_update >> [transform_pipeline, skip_transform]
+        extract_pipeline >> check_update >> [
+            transform_pipeline,
+            skip_transform,
+        ]
 
     globals()[dag.dag_id] = dag
-
