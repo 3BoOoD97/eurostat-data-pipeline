@@ -16,11 +16,26 @@ The resulting datasets will enable country-level comparisons against the EU27 ag
 - Analyze asylum applications, pending cases, and decision outcomes across European countries, comparing country-level trends with the EU27 aggregate.
 - Build Power BI dashboards and explore time-series forecasting to identify trends and potential pressures on asylum systems.
 
-
 ---
 
-## Current-State Architecture Diagram
+## Datasets
+
+| Dataset ID | Description | Frequency |
+| :--- | :--- | :--- |
+| [migr_asyappctzm](https://ec.europa.eu/eurostat/databrowser/view/migr_asyappctzm/default/table) | Asylum applications | Monthly |
+| [migr_asypenctzm](https://ec.europa.eu/eurostat/databrowser/view/migr_asypenctzm/default/table) | Pending asylum applications | Monthly |
+| [migr_asydcfstq](https://ec.europa.eu/eurostat/databrowser/view/migr_asydcfstq/default/table) | Asylum decisions | Quarterly |
+
+
+## Architecture
+
+### Local Architecture
+The local pipeline uses Docker containers for extraction and transformation, with Airflow orchestrating the tasks and their dependencies
+
 ![Current-State Architecture](docs/current_local_architecture.jpeg)
+
+### Azure Architecture
+...
 
 ---
 
@@ -90,3 +105,36 @@ The local Docker and Airflow pipeline has been tested successfully with the foll
 - Airflow DAG execution for all configured datasets
 
 The local pipeline is stable for local execution. The next step is to implement and test cloud storage integration.
+
+---
+
+## Azure Deployment
+The pipeline has been deployed to Azure using Azure Container Apps Jobs and a Docker image hosted in GitHub Container Registry.
+
+### Azure Resources
+| Resource | Name |
+| :--- | :--- |
+| **Resource Group** | `rg-eurostat-pipeline-dev` |
+| **Container Apps Environment** | `cae-eurostat-pipeline-wp` |
+| **Container Apps Job** | `eurostat-pipeline-job` |
+| **Storage Account** | `eurostatpipe0255` |
+| **Azure File Share** | `eurostat-output` |
+| **Container Image** | `ghcr.io/3boood97/eurostat-pipeline:v0.1.0` |
+
+
+### Container Execution
+The Azure Job uses the Docker image from GitHub Container Registry.
+The image contains the Python extraction and chunked transformation components, along with their required dependencies.
+The pipeline orchestrator, src/main_pipeline.py, runs extraction first and transformation second for the selected dataset. 
+
+### Storage
+The storage contains the following directories:
+| Directory | Purpose |
+| :--- | :--- |
+| `raw` | Downloaded source datasets |
+| `processed` | Processed Parquet datasets |
+| `last_download_date` | Stored source download dates |
+| `last_processed_date` | Stored processing dates |
+
+
+
