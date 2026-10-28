@@ -92,7 +92,7 @@ df_dim_date.write.format("delta").mode("overwrite").saveAsTable("gold.dim_date")
 
 df_gold_asyappctzm = df_silver_asyappctzm.select(
     "time_period", "country_code", "country_name", "nationality_code", "applicant_type",
-    "sex", "age_group", "flag", "applicant_count"
+    "flag", "applicant_count"
     )
 
 df_gold_asyappctzm.write.format("delta").mode("overwrite").saveAsTable("gold.fact_asyappctzm")
@@ -110,7 +110,7 @@ df_gold_asyappctzm.write.format("delta").mode("overwrite").saveAsTable("gold.fac
 
 df_gold_asydcfstq = df_silver_asydcfstq.select(
     "time_period", "country_code", "country_name", "nationality_code", 
-    "decision", "sex", "age_group", "flag", "decision_count"
+    "decision", "flag", "decision_count"
 )
 
 df_gold_asydcfstq.write.format("delta").mode("overwrite").saveAsTable("gold.fact_asydcfstq")
@@ -128,7 +128,7 @@ df_gold_asydcfstq.write.format("delta").mode("overwrite").saveAsTable("gold.fact
 
 df_gold_asypenctzm = df_silver_asypenctzm.select(
     "time_period", "country_code", "country_name", "nationality_code", 
-    "sex", "age_group", "flag", "pending_count"
+    "flag", "pending_count"
 )
 
 df_gold_asypenctzm.write.format("delta").mode("overwrite").saveAsTable("gold.fact_asypenctzm")
