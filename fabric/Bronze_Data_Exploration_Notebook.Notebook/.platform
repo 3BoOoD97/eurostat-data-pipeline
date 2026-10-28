@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "Bronze_Data_Exploration_Notebook"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "9949e1aa-0bd5-850e-4902-3b8650707ac4"
+  }
+}

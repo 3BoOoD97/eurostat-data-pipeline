@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "eurostat_azure_to_lakehouse_Pipeline"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "d253b6b1-6463-bfea-4530-aa8d89cd9882"
+  }
+}
