@@ -1,0 +1,141 @@
+table fact_asypenctzm
+	lineageTag: e470576f-635c-4946-8f0b-34737acd9582
+	sourceLineageTag: [gold].[fact_asypenctzm]
+
+	measure 'Total Pending (Latest Month)' = ```
+			
+			VAR MaxPeriodWithData = 
+			    MAXX(
+			        FILTER(
+			            VALUES('fact_asypenctzm'[time_period]),
+			            NOT ISBLANK([Total Pending]) && [Total Pending] > 0
+			        ),
+			        'fact_asypenctzm'[time_period]
+			    )
+			RETURN
+			CALCULATE(
+			    [Total Pending],
+			    'fact_asypenctzm'[time_period] = MaxPeriodWithData
+			)
+			```
+		formatString: 0
+		lineageTag: d51b0246-830f-45a0-8a7c-daafb3d56754
+
+		changedProperty = Name
+
+	measure 'Total Pending (Analytical)' =
+			
+			CALCULATE(
+			    SUM('fact_asypenctzm'[pending_count]),
+			    'fact_asypenctzm'[country_name] <> "European Union - 27 countries",
+			    'fact_asypenctzm'[country_code] <> "EU27_2020",
+			    'fact_asypenctzm'[nationality_code] <> "EXT_EU27_2020")
+		formatString: 0
+		lineageTag: 37ae5bb1-58b1-4689-a217-22bd4c252eae
+
+		changedProperty = Name
+
+	measure 'Total Pending' =
+			
+			VAR IsCountryFiltered = ISFILTERED('fact_asypenctzm'[country_name])
+			VAR IsNationalityFiltered = ISFILTERED('fact_asypenctzm'[nationality_code])
+			
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    IsCountryFiltered && IsNationalityFiltered,
+			        CALCULATE(
+			            SUM('fact_asypenctzm'[pending_count]),
+			            KEEPFILTERS('fact_asypenctzm'[country_code] <> "EU27_2020"),
+			            KEEPFILTERS('fact_asypenctzm'[nationality_code] <> "EXT_EU27_2020")
+			        ),
+			    IsCountryFiltered && NOT(IsNationalityFiltered),
+			        CALCULATE(
+			            SUM('fact_asypenctzm'[pending_count]),
+			            KEEPFILTERS('fact_asypenctzm'[country_code] <> "EU27_2020"),
+			            'fact_asypenctzm'[nationality_code] = "EXT_EU27_2020"
+			        ),
+			    NOT(IsCountryFiltered) && IsNationalityFiltered,
+			        CALCULATE(
+			            SUM('fact_asypenctzm'[pending_count]),
+			            'fact_asypenctzm'[country_code] = "EU27_2020",
+			            KEEPFILTERS('fact_asypenctzm'[nationality_code] <> "EXT_EU27_2020")
+			        ),
+			    CALCULATE(
+			        SUM('fact_asypenctzm'[pending_count]),
+			        'fact_asypenctzm'[country_code] = "EU27_2020",
+			        'fact_asypenctzm'[nationality_code] = "EXT_EU27_2020"
+			    )
+			)
+		formatString: 0
+		lineageTag: 1e195e61-8125-4b2c-ab55-4749c77a836a
+
+		changedProperty = Name
+
+	measure Measure
+		lineageTag: 161d759f-4f37-40e2-b874-c231068c6794
+
+		annotation 43dbc3e8-3a1c-4b6f-9923-b49ff7d6691c = True
+
+	column time_period
+		dataType: string
+		lineageTag: ec31eb26-b930-407f-af3d-16a53712fd6f
+		sourceLineageTag: time_period
+		summarizeBy: none
+		sourceColumn: time_period
+
+		annotation SummarizationSetBy = Automatic
+
+	column country_code
+		dataType: string
+		lineageTag: fa5832d9-257d-49f6-a82d-c3835d836328
+		sourceLineageTag: country_code
+		summarizeBy: none
+		sourceColumn: country_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column country_name
+		dataType: string
+		lineageTag: 4e427119-85ad-4501-a639-b90bef63b0b4
+		sourceLineageTag: country_name
+		summarizeBy: none
+		sourceColumn: country_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column nationality_code
+		dataType: string
+		lineageTag: 4ae638d3-b528-4c5f-a7f4-aeb56374a9a5
+		sourceLineageTag: nationality_code
+		summarizeBy: none
+		sourceColumn: nationality_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column flag
+		dataType: string
+		lineageTag: 20b3bcaf-bcfb-4176-8ee8-47f1a128f95a
+		sourceLineageTag: flag
+		summarizeBy: none
+		sourceColumn: flag
+
+		annotation SummarizationSetBy = Automatic
+
+	column pending_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 3ca7948f-ea7a-496e-9bb8-a3a29af88fd1
+		sourceLineageTag: pending_count
+		summarizeBy: sum
+		sourceColumn: pending_count
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_asypenctzm = entity
+		mode: directLake
+		source
+			entityName: fact_asypenctzm
+			schemaName: gold
+			expressionSource: 'DirectLake - Eurostat_Asylum_Lakehouse'
+
