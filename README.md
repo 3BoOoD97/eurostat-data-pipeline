@@ -136,5 +136,23 @@ The storage contains the following directories:
 | `last_download_date` | Stored source download dates |
 | `last_processed_date` | Stored processing dates |
 
+---
 
+## Dashboard Visuals
+
+### Executive Summary Report
+Executive summary and key general indicators.
+![Executive Summary Report](docs/BI%20Reports/Executive%20Summary.png)
+
+### Applications Report
+Analyzing the asylum trends and the distinction between first-time and SSEQ (Subsequent Applicant)
+![Applications Report](docs/BI%20Reports/Applications.png)
+
+### Decisions & Recognition Rates Report
+Asylum decisions and recognition rates
+![Decisions & Recognition Rates](<docs/BI Reports/Decisions & Recognition Rates.png>)
+
+### Pending Report
+Pending cases and a snapshot of the most recent monthly records.
+![Pending Report](docs/BI%20Reports/Pending.png)
 
