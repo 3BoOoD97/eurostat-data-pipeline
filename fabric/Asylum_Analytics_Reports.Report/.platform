@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Asylum_Analytics_Reports"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "d1073b28-8652-a2f8-4e26-75a698a87a9d"
+  }
+}

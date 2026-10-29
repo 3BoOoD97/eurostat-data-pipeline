@@ -1,0 +1,193 @@
+table fact_asydcfstq
+	lineageTag: d1670db0-ca5d-4672-b8cc-d7be522b7744
+	sourceLineageTag: [gold].[fact_asydcfstq]
+
+	measure 'Total Decisions (TOTAL)' =
+			
+			CALCULATE(
+			    SUM('fact_asydcfstq'[decision_count]),
+			    'fact_asydcfstq'[decision] = "TOTAL",
+			    'fact_asydcfstq'[country_name] = "European Union - 27 countries",
+			    'fact_asydcfstq'[country_code] = "EU27_2020",
+			    'fact_asydcfstq'[nationality_code] = "EXT_EU27_2020")
+		formatString: 0
+		lineageTag: 27942970-c9ef-4328-b762-cf983c63fad6
+
+		changedProperty = Name
+
+	measure 'Total Decisions (Analytical)' =
+			
+			CALCULATE(
+			    SUM('fact_asydcfstq'[decision_count]),
+			    'fact_asydcfstq'[decision] <> "TOTAL",
+			    'fact_asydcfstq'[country_name] <> "European Union - 27 countries",
+			    'fact_asydcfstq'[country_code] <> "EU27_2020",
+			     'fact_asydcfstq'[nationality_code] <> "EXT_EU27_2020")
+		formatString: 0
+		lineageTag: 1a448c41-4687-40a3-832b-53fccc70afdf
+
+		changedProperty = Name
+
+	measure 'Total Decisions (Page 3)' =
+			
+			VAR IsCountryFiltered = ISFILTERED('fact_asydcfstq'[country_name])
+			VAR IsNationalityFiltered = ISFILTERED('fact_asydcfstq'[nationality_code])
+			
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    IsCountryFiltered && IsNationalityFiltered,
+			        CALCULATE(
+			            SUM('fact_asydcfstq'[decision_count]),
+			            'fact_asydcfstq'[decision] = "TOTAL",
+			            KEEPFILTERS('fact_asydcfstq'[country_code] <> "EU27_2020"),
+			            KEEPFILTERS('fact_asydcfstq'[nationality_code] <> "EXT_EU27_2020")
+			        ),
+			    IsCountryFiltered && NOT(IsNationalityFiltered),
+			        CALCULATE(
+			            SUM('fact_asydcfstq'[decision_count]),
+			            'fact_asydcfstq'[decision] = "TOTAL",
+			            KEEPFILTERS('fact_asydcfstq'[country_code] <> "EU27_2020"),
+			            'fact_asydcfstq'[nationality_code] = "EXT_EU27_2020"
+			        ),
+			    NOT(IsCountryFiltered) && IsNationalityFiltered,
+			        CALCULATE(
+			            SUM('fact_asydcfstq'[decision_count]),
+			            'fact_asydcfstq'[decision] = "TOTAL",
+			            'fact_asydcfstq'[country_code] = "EU27_2020",
+			            KEEPFILTERS('fact_asydcfstq'[nationality_code] <> "EXT_EU27_2020")
+			        ),
+			    CALCULATE(
+			        SUM('fact_asydcfstq'[decision_count]),
+			        'fact_asydcfstq'[decision] = "TOTAL",
+			        'fact_asydcfstq'[country_code] = "EU27_2020",
+			        'fact_asydcfstq'[nationality_code] = "EXT_EU27_2020"
+			    )
+			)
+		formatString: 0
+		lineageTag: ce0cb2f3-38ec-4c81-9d21-6110167c9e43
+
+		changedProperty = Name
+
+	measure 'Positive Decisions' =
+			
+			VAR IsCountryFiltered = ISFILTERED('fact_asydcfstq'[country_name])
+			VAR IsNationalityFiltered = ISFILTERED('fact_asydcfstq'[nationality_code])
+			
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    IsCountryFiltered && IsNationalityFiltered,
+			        CALCULATE(
+			            SUM('fact_asydcfstq'[decision_count]),
+			            'fact_asydcfstq'[decision] = "POS",
+			            KEEPFILTERS('fact_asydcfstq'[country_code] <> "EU27_2020"),
+			            KEEPFILTERS('fact_asydcfstq'[nationality_code] <> "EXT_EU27_2020")
+			        ),
+			    IsCountryFiltered && NOT(IsNationalityFiltered),
+			        CALCULATE(
+			            SUM('fact_asydcfstq'[decision_count]),
+			            'fact_asydcfstq'[decision] = "POS",
+			            KEEPFILTERS('fact_asydcfstq'[country_code] <> "EU27_2020"),
+			            'fact_asydcfstq'[nationality_code] = "EXT_EU27_2020"
+			        ),
+			    NOT(IsCountryFiltered) && IsNationalityFiltered,
+			        CALCULATE(
+			            SUM('fact_asydcfstq'[decision_count]),
+			            'fact_asydcfstq'[decision] = "POS",
+			            'fact_asydcfstq'[country_code] = "EU27_2020",
+			            KEEPFILTERS('fact_asydcfstq'[nationality_code] <> "EXT_EU27_2020")
+			        ),
+			    CALCULATE(
+			        SUM('fact_asydcfstq'[decision_count]),
+			        'fact_asydcfstq'[decision] = "POS",
+			        'fact_asydcfstq'[country_code] = "EU27_2020",
+			        'fact_asydcfstq'[nationality_code] = "EXT_EU27_2020"
+			    )
+			)
+		formatString: 0
+		lineageTag: f1f90c84-a3c8-4d08-a5b0-b504c7672c47
+
+		changedProperty = Name
+
+	measure 'Recognition Rate %' =
+			
+			DIVIDE([Positive Decisions], [Total Decisions (Page 3)], 0)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 35958b78-a2a1-431d-8c2d-53a9eace7176
+
+		changedProperty = Name
+
+		changedProperty = FormatString
+
+	column time_period
+		dataType: string
+		lineageTag: 9bc097a1-43da-44c4-a42c-d67398b2c2cb
+		sourceLineageTag: time_period
+		summarizeBy: none
+		sourceColumn: time_period
+
+		annotation SummarizationSetBy = Automatic
+
+	column country_code
+		dataType: string
+		lineageTag: 89c615a2-26b4-4fec-b32c-94990c4522ec
+		sourceLineageTag: country_code
+		summarizeBy: none
+		sourceColumn: country_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column country_name
+		dataType: string
+		lineageTag: a48bea52-a0b6-426a-9e06-5a10bd1fed35
+		sourceLineageTag: country_name
+		summarizeBy: none
+		sourceColumn: country_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column nationality_code
+		dataType: string
+		lineageTag: a6d99da6-c9c9-4f43-a85a-88ee25b22966
+		sourceLineageTag: nationality_code
+		summarizeBy: none
+		sourceColumn: nationality_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column decision
+		dataType: string
+		lineageTag: acc8633a-9efb-4c72-93b5-befbad218cc4
+		sourceLineageTag: decision
+		summarizeBy: none
+		sourceColumn: decision
+
+		annotation SummarizationSetBy = Automatic
+
+	column flag
+		dataType: string
+		lineageTag: 63533caf-6703-4a53-97ae-87bf3da69a26
+		sourceLineageTag: flag
+		summarizeBy: none
+		sourceColumn: flag
+
+		annotation SummarizationSetBy = Automatic
+
+	column decision_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 5a47525b-5972-4f17-aead-79ebde3271f2
+		sourceLineageTag: decision_count
+		summarizeBy: sum
+		sourceColumn: decision_count
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_asydcfstq = entity
+		mode: directLake
+		source
+			entityName: fact_asydcfstq
+			schemaName: gold
+			expressionSource: 'DirectLake - Eurostat_Asylum_Lakehouse'
+

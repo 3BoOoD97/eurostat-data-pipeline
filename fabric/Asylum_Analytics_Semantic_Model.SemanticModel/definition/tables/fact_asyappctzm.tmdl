@@ -1,0 +1,223 @@
+table fact_asyappctzm
+	lineageTag: 19913905-ced7-4d73-9f7e-c0868875afeb
+	sourceLineageTag: [gold].[fact_asyappctzm]
+
+	measure 'Total Applications (TOTAL)' =
+			
+			CALCULATE(
+			    SUM('fact_asyappctzm'[applicant_count]),
+			    'fact_asyappctzm'[applicant_type] = "TOTAL",
+			    'fact_asyappctzm'[country_name] = "European Union - 27 countries",
+			    'fact_asyappctzm'[country_code] = "EU27_2020",
+			    'fact_asyappctzm'[nationality_code] = "EXT_EU27_2020")
+		formatString: 0
+		lineageTag: 8e5291fa-630b-46c0-8f94-c9e4c735c6bd
+
+		changedProperty = Name
+
+	measure 'Total Applications (Analytical)' =
+			
+			CALCULATE(
+			    SUM('fact_asyappctzm'[applicant_count]),
+			    'fact_asyappctzm'[applicant_type] <> "TOTAL",
+			    'fact_asyappctzm'[country_name] <> "European Union - 27 countries",
+			    'fact_asyappctzm'[country_code] <> "EU27_2020",
+			    'fact_asyappctzm'[nationality_code] <> "EXT_EU27_2020")
+		formatString: 0
+		lineageTag: b2e12e46-e8a8-45c3-a001-676d8f9b71ee
+
+		changedProperty = Name
+
+	measure 'Total Applications (Country Level)' =
+			
+			CALCULATE(
+			    SUM('fact_asyappctzm'[applicant_count]),
+			    'fact_asyappctzm'[applicant_type] = "TOTAL",
+			    'fact_asyappctzm'[nationality_code] = "EXT_EU27_2020",
+			    KEEPFILTERS('fact_asyappctzm'[country_code] <> "EU27_2020"),
+			    KEEPFILTERS('fact_asyappctzm'[country_name] <> "European Union - 27 countries")
+			)
+		formatString: 0
+		lineageTag: 62241cd4-8e3f-432f-b0f7-cd91d074149e
+
+		changedProperty = Name
+
+	measure 'Total Applications (Nationality Level)' =
+			
+			CALCULATE(
+			    SUM('fact_asyappctzm'[applicant_count]),
+			    'fact_asyappctzm'[applicant_type] = "TOTAL",
+			    'fact_asyappctzm'[country_code] = "EU27_2020",
+			    'fact_asyappctzm'[nationality_code] <> "EXT_EU27_2020",
+			    'fact_asyappctzm'[nationality_code] <> "TOTAL"
+			)
+		formatString: 0
+		lineageTag: 7105d673-1b09-4f8f-9e63-e23ec69674e6
+
+		changedProperty = Name
+
+	measure 'First-Time Applications' =
+			
+			CALCULATE(
+			    SUM('fact_asyappctzm'[applicant_count]),
+			    'fact_asyappctzm'[applicant_type] = "FRST",
+			    'fact_asyappctzm'[country_code] = "EU27_2020",
+			    'fact_asyappctzm'[nationality_code] = "EXT_EU27_2020"
+			)
+		formatString: 0
+		lineageTag: 505fc92f-d630-405f-ba32-06f5a9c428e0
+
+		changedProperty = Name
+
+	measure 'Subsequent Applications' =
+			
+			CALCULATE(
+			    SUM('fact_asyappctzm'[applicant_count]),
+			    'fact_asyappctzm'[applicant_type] = "SSEQ",
+			    'fact_asyappctzm'[country_code] = "EU27_2020",
+			    'fact_asyappctzm'[nationality_code] = "EXT_EU27_2020"
+			)
+		formatString: 0
+		lineageTag: 19ad3e55-4c94-46fa-a2ba-74db7c5df84a
+
+		changedProperty = Name
+
+	measure 'Applications (Nationality Level)' =
+			
+			IF(
+			    ISFILTERED('fact_asyappctzm'[country_name]),
+			    CALCULATE(
+			        SUM('fact_asyappctzm'[applicant_count]),
+			        'fact_asyappctzm'[applicant_type] = "TOTAL",
+			        KEEPFILTERS('fact_asyappctzm'[nationality_code] <> "EXT_EU27_2020"),
+			        KEEPFILTERS('fact_asyappctzm'[nationality_code] <> "TOTAL")
+			    ),
+			    CALCULATE(
+			        SUM('fact_asyappctzm'[applicant_count]),
+			        'fact_asyappctzm'[applicant_type] = "TOTAL",
+			        'fact_asyappctzm'[country_code] = "EU27_2020",
+			        KEEPFILTERS('fact_asyappctzm'[nationality_code] <> "EXT_EU27_2020"),
+			        KEEPFILTERS('fact_asyappctzm'[nationality_code] <> "TOTAL")
+			    )
+			)
+		formatString: 0
+		lineageTag: 4cbf3573-acae-4e31-b4a9-60b36db3a559
+
+		changedProperty = Name
+
+	measure 'Applications (By Type)' = ```
+			
+			VAR IsCountryFiltered = ISFILTERED('fact_asyappctzm'[country_name])
+			VAR IsNationalityFiltered = ISFILTERED('fact_asyappctzm'[nationality_code])
+			
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    IsCountryFiltered && IsNationalityFiltered,
+			        CALCULATE(
+			            SUM('fact_asyappctzm'[applicant_count]),
+			            'fact_asyappctzm'[applicant_type] IN {"FRST", "SSEQ"},
+			            KEEPFILTERS('fact_asyappctzm'[country_code] <> "EU27_2020"),
+			            KEEPFILTERS('fact_asyappctzm'[nationality_code] <> "EXT_EU27_2020")
+			        ),
+			        
+			    IsCountryFiltered && NOT(IsNationalityFiltered),
+			        CALCULATE(
+			            SUM('fact_asyappctzm'[applicant_count]),
+			            'fact_asyappctzm'[applicant_type] IN {"FRST", "SSEQ"},
+			            KEEPFILTERS('fact_asyappctzm'[country_code] <> "EU27_2020"),
+			            'fact_asyappctzm'[nationality_code] = "EXT_EU27_2020"
+			        ),
+			        
+			    NOT(IsCountryFiltered) && IsNationalityFiltered,
+			        CALCULATE(
+			            SUM('fact_asyappctzm'[applicant_count]),
+			            'fact_asyappctzm'[applicant_type] IN {"FRST", "SSEQ"},
+			            'fact_asyappctzm'[country_code] = "EU27_2020",
+			            KEEPFILTERS('fact_asyappctzm'[nationality_code] <> "EXT_EU27_2020")
+			        ),
+			        
+			    CALCULATE(
+			        SUM('fact_asyappctzm'[applicant_count]),
+			        'fact_asyappctzm'[applicant_type] IN {"FRST", "SSEQ"},
+			        'fact_asyappctzm'[country_code] = "EU27_2020",
+			        'fact_asyappctzm'[nationality_code] = "EXT_EU27_2020"
+			    )
+			)
+			```
+		formatString: 0
+		lineageTag: 1c84c698-1469-432b-b6e5-540c5bb3d012
+
+		changedProperty = Name
+
+	column time_period
+		dataType: string
+		lineageTag: 419e36f8-ee38-4ace-acc4-f76f2ed17c40
+		sourceLineageTag: time_period
+		summarizeBy: none
+		sourceColumn: time_period
+
+		annotation SummarizationSetBy = Automatic
+
+	column country_code
+		dataType: string
+		lineageTag: 4707c82a-e281-46ec-bbae-fe0344e61617
+		sourceLineageTag: country_code
+		summarizeBy: none
+		sourceColumn: country_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column country_name
+		dataType: string
+		lineageTag: 5808dd31-9d3b-4ff0-8afd-b9678b6a5e61
+		sourceLineageTag: country_name
+		summarizeBy: none
+		sourceColumn: country_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column nationality_code
+		dataType: string
+		lineageTag: bfe6e4f8-e9da-4e7e-85d0-4f0b1dcfae91
+		sourceLineageTag: nationality_code
+		summarizeBy: none
+		sourceColumn: nationality_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column applicant_type
+		dataType: string
+		lineageTag: fdf83bf2-1105-4e24-b4df-043b2069130a
+		sourceLineageTag: applicant_type
+		summarizeBy: none
+		sourceColumn: applicant_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column flag
+		dataType: string
+		lineageTag: a11db223-fd06-47b6-96b6-41e5360b63e8
+		sourceLineageTag: flag
+		summarizeBy: none
+		sourceColumn: flag
+
+		annotation SummarizationSetBy = Automatic
+
+	column applicant_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 6917c883-2f13-4cf6-8828-63a2aef57b61
+		sourceLineageTag: applicant_count
+		summarizeBy: sum
+		sourceColumn: applicant_count
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_asyappctzm = entity
+		mode: directLake
+		source
+			entityName: fact_asyappctzm
+			schemaName: gold
+			expressionSource: 'DirectLake - Eurostat_Asylum_Lakehouse'
+
