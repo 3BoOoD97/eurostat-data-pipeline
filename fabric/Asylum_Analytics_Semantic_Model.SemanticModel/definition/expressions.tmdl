@@ -1,0 +1,11 @@
+expression 'DirectLake - Eurostat_Asylum_Lakehouse' =
+		let
+		    Source = AzureStorage.DataLake("https://onelake.dfs.fabric.microsoft.com/4b2e584f-8b24-4a80-9eaa-92484d08b3a7/a904ab17-bc40-4b65-8d6f-bccceb88dcd3", [HierarchicalNavigation=true])
+		in
+		    Source
+	lineageTag: 3c144b7c-1f7d-4768-a60f-86ea6b38f876
+
+	annotation PBI_IncludeFutureArtifacts = False
+
+	annotation PBI_RemovedChildren = [{"remoteItemId":{"analysisServicesObject":{"sourceName":null,"sourceLineageTag":"[bronze].[asydcfstq]"}},"objectType":"Table"},{"remoteItemId":{"analysisServicesObject":{"sourceName":null,"sourceLineageTag":"[silver].[asypenctzm]"}},"objectType":"Table"},{"remoteItemId":{"analysisServicesObject":{"sourceName":null,"sourceLineageTag":"[silver].[asydcfstq]"}},"objectType":"Table"},{"remoteItemId":{"analysisServicesObject":{"sourceName":null,"sourceLineageTag":"[silver].[asyappctzm]"}},"objectType":"Table"},{"remoteItemId":{"analysisServicesObject":{"sourceName":null,"sourceLineageTag":"[bronze].[asyappctzm]"}},"objectType":"Table"},{"remoteItemId":{"analysisServicesObject":{"sourceName":null,"sourceLineageTag":"[bronze].[asypenctzm]"}},"objectType":"Table"}]
+

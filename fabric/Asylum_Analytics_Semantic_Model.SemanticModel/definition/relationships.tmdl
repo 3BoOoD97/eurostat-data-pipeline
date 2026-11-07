@@ -1,0 +1,12 @@
+relationship 71b19c9a-c64c-2af6-c9cc-b325996949a2
+	fromColumn: fact_asyappctzm.time_period
+	toColumn: dim_date.time_period
+
+relationship 43379a48-499f-1195-0fde-9e8962f96757
+	fromColumn: fact_asypenctzm.time_period
+	toColumn: dim_date.time_period
+
+relationship baa9f6e3-45c4-ebfc-ce82-85dc82b1d465
+	fromColumn: fact_asydcfstq.time_period
+	toColumn: dim_date.time_period
+

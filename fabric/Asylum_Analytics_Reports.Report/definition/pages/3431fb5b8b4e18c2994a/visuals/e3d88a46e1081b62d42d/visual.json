@@ -1,0 +1,74 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "e3d88a46e1081b62d42d",
+  "position": {
+    "x": 580.34620505992007,
+    "y": 191.74434087882821,
+    "z": 2,
+    "height": 280,
+    "width": 280,
+    "tabOrder": 2
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_asypenctzm"
+                    }
+                  },
+                  "Property": "Total Pending (Latest Month)"
+                }
+              },
+              "queryRef": "fact_asypenctzm.Total Pending (Latest Month)",
+              "nativeQueryRef": "Total Pending (Latest Month)"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "fact_asypenctzm"
+                  }
+                },
+                "Property": "Total Pending (Latest Month)"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "e60e75053013000e73c6",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_asypenctzm"
+              }
+            },
+            "Property": "Total Pending (Latest Month)"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "93ed71dd9800c22b334a",
+  "position": {
+    "x": 1349.8801597869506,
+    "y": 191.74434087882821,
+    "z": 0,
+    "height": 280,
+    "width": 280,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_asyappctzm"
+                    }
+                  },
+                  "Property": "Total Applications (TOTAL)"
+                }
+              },
+              "queryRef": "fact_asyappctzm.Total Applications (TOTAL)",
+              "nativeQueryRef": "Total Applications (TOTAL)"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "fact_asyappctzm"
+                  }
+                },
+                "Property": "Total Applications (TOTAL)"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "56ac9a264a4ead885899",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_asyappctzm"
+              }
+            },
+            "Property": "Total Applications (TOTAL)"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}

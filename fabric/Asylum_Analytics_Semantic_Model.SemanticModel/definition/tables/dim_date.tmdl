@@ -1,0 +1,56 @@
+table dim_date
+	lineageTag: 01ab805b-e5c9-490f-b82a-3b30d04ae5d5
+	sourceLineageTag: [gold].[dim_date]
+
+	column time_period
+		dataType: string
+		lineageTag: a36040eb-4f7c-4271-aa81-1eab8d8b2b3e
+		sourceLineageTag: time_period
+		summarizeBy: none
+		sourceColumn: time_period
+
+		annotation SummarizationSetBy = Automatic
+
+	column year
+		dataType: string
+		lineageTag: 07d069af-a568-4bdb-b768-9d6289338065
+		sourceLineageTag: year
+		summarizeBy: none
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	column period_type
+		dataType: string
+		lineageTag: b50b17c1-7220-4c0e-ac8f-ce6684a2a8b5
+		sourceLineageTag: period_type
+		summarizeBy: none
+		sourceColumn: period_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column month
+		dataType: string
+		lineageTag: aa3e35c1-1b82-44eb-b4ca-c4cbdb25be46
+		sourceLineageTag: month
+		summarizeBy: none
+		sourceColumn: month
+
+		annotation SummarizationSetBy = Automatic
+
+	column quarter
+		dataType: string
+		lineageTag: 56019a55-29ce-4379-9fc1-fafb8edbcf69
+		sourceLineageTag: quarter
+		summarizeBy: none
+		sourceColumn: quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_date = entity
+		mode: directLake
+		source
+			entityName: dim_date
+			schemaName: gold
+			expressionSource: 'DirectLake - Eurostat_Asylum_Lakehouse'
+

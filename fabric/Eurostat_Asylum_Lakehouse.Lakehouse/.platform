@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Lakehouse",
+    "displayName": "Eurostat_Asylum_Lakehouse"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "eb88dcd3-bccc-8d6f-4b65-bc40a904ab17"
+  }
+}
