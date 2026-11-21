@@ -2,196 +2,33 @@
   "properties": {
     "activities": [
       {
-        "type": "Copy",
+        "type": "Lookup",
         "typeProperties": {
           "source": {
-            "type": "ParquetSource",
-            "storeSettings": {
-              "type": "AzureFileStorageReadSettings",
-              "recursive": true,
-              "enablePartitionDiscovery": false,
-              "maxConcurrentConnections": 0
-            },
-            "formatSettings": {
-              "type": "ParquetReadSettings"
-            },
-            "datasetSettings": {
-              "type": "Parquet",
-              "typeProperties": {
-                "location": {
-                  "type": "AzureFileStorageLocation",
-                  "folderPath": "processed",
-                  "fileName": "migr_asyappctzm_chunked_processed.parquet"
-                },
-                "compressionCodec": "snappy"
-              },
-              "schema": [],
-              "externalReferences": {
-                "connection": "1653845a-f0bb-4012-ba4e-847a29659c69"
-              },
-              "annotations": []
-            }
+            "type": "LakehouseTableSource"
           },
-          "sink": {
-            "type": "LakehouseTableSink",
-            "tableActionOption": "OverwriteSchema",
-            "applyVOrder": false,
-            "enableTimestampNtz": false,
-            "partitionOption": "None",
-            "datasetSettings": {
-              "type": "LakehouseTable",
-              "typeProperties": {
-                "schema": "bronze",
-                "table": "asyappctzm"
-              },
-              "schema": [],
-              "linkedService": {
-                "name": "Eurostat_Asylum_Lakehouse",
-                "properties": {
-                  "type": "Lakehouse",
-                  "typeProperties": {
-                    "artifactId": "eb88dcd3-bccc-8d6f-4b65-bc40a904ab17",
-                    "workspaceId": "00000000-0000-0000-0000-000000000000",
-                    "rootFolder": "Tables"
-                  },
-                  "annotations": []
-                }
-              },
-              "annotations": []
-            }
-          },
-          "translator": {
-            "type": "TabularTranslator",
-            "mappings": [
-              {
-                "source": {
-                  "name": "freq",
-                  "type": "String",
-                  "physicalType": "STRING"
+          "datasetSettings": {
+            "type": "LakehouseTable",
+            "typeProperties": {
+              "schema": "control",
+              "table": "fabric_watermarks"
+            },
+            "schema": [],
+            "linkedService": {
+              "name": "Eurostat_Asylum_Lakehouse",
+              "properties": {
+                "type": "Lakehouse",
+                "typeProperties": {
+                  "artifactId": "eb88dcd3-bccc-8d6f-4b65-bc40a904ab17",
+                  "workspaceId": "00000000-0000-0000-0000-000000000000",
+                  "rootFolder": "Tables"
                 },
-                "sink": {
-                  "name": "freq",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "unit",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "unit",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "nationality_code",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "nationality_code",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "sex",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "sex",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "applicant_type",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "applicant_type",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "age_group",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "age_group",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "country_code",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "country_code",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "time_period",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "time_period",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "applicant_count",
-                  "type": "Int64",
-                  "physicalType": "INT64"
-                },
-                "sink": {
-                  "name": "applicant_count",
-                  "physicalType": "long"
-                }
-              },
-              {
-                "source": {
-                  "name": "flag",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "flag",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "country_name",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "country_name",
-                  "physicalType": "string"
-                }
+                "annotations": []
               }
-            ],
-            "typeConversion": true,
-            "typeConversionSettings": {
-              "allowDataTruncation": true,
-              "treatBooleanAsNumber": false
-            }
+            },
+            "annotations": []
           },
-          "enableStaging": false
+          "firstRowOnly": false
         },
         "policy": {
           "timeout": "0.12:00:00",
@@ -200,410 +37,216 @@
           "secureInput": false,
           "secureOutput": false
         },
-        "name": "Copy asyappctzm data",
+        "name": "Fabric_Watermarks",
         "dependsOn": []
       },
       {
-        "type": "Copy",
+        "type": "ForEach",
         "typeProperties": {
-          "source": {
-            "type": "ParquetSource",
-            "storeSettings": {
-              "type": "AzureFileStorageReadSettings",
-              "recursive": false,
-              "enablePartitionDiscovery": false,
-              "maxConcurrentConnections": 0
-            },
-            "formatSettings": {
-              "type": "ParquetReadSettings"
-            },
-            "datasetSettings": {
-              "type": "Parquet",
-              "typeProperties": {
-                "location": {
-                  "type": "AzureFileStorageLocation",
-                  "folderPath": "processed",
-                  "fileName": "migr_asydcfstq_chunked_processed.parquet"
-                },
-                "compressionCodec": "snappy"
-              },
-              "schema": [],
-              "externalReferences": {
-                "connection": "1653845a-f0bb-4012-ba4e-847a29659c69"
-              },
-              "annotations": []
-            }
+          "isSequential": true,
+          "items": {
+            "value": "@activity('Fabric_Watermarks').output.value",
+            "type": "Expression"
           },
-          "sink": {
-            "type": "LakehouseTableSink",
-            "tableActionOption": "OverwriteSchema",
-            "applyVOrder": false,
-            "enableTimestampNtz": false,
-            "partitionOption": "None",
-            "datasetSettings": {
-              "type": "LakehouseTable",
+          "activities": [
+            {
+              "type": "Lookup",
               "typeProperties": {
-                "schema": "bronze",
-                "table": "asydcfstq"
-              },
-              "schema": [],
-              "linkedService": {
-                "name": "Eurostat_Asylum_Lakehouse",
-                "properties": {
-                  "type": "Lakehouse",
+                "source": {
+                  "type": "DelimitedTextSource",
+                  "formatSettings": {
+                    "type": "DelimitedTextReadSettings"
+                  },
+                  "storeSettings": {
+                    "type": "AzureFileStorageReadSettings",
+                    "recursive": false,
+                    "enablePartitionDiscovery": false
+                  }
+                },
+                "datasetSettings": {
+                  "type": "DelimitedText",
                   "typeProperties": {
-                    "artifactId": "eb88dcd3-bccc-8d6f-4b65-bc40a904ab17",
-                    "workspaceId": "00000000-0000-0000-0000-000000000000",
-                    "rootFolder": "Tables"
+                    "location": {
+                      "type": "AzureFileStorageLocation",
+                      "folderPath": "last_processed_date",
+                      "fileName": {
+                        "value": "@concat(item().dataset_name, '.txt')",
+                        "type": "Expression"
+                      }
+                    },
+                    "columnDelimiter": ",",
+                    "quoteChar": "\"",
+                    "escapeChar": "\\",
+                    "firstRowAsHeader": false
+                  },
+                  "schema": [],
+                  "externalReferences": {
+                    "connection": "1653845a-f0bb-4012-ba4e-847a29659c69"
                   },
                   "annotations": []
-                }
-              },
-              "annotations": []
-            }
-          },
-          "translator": {
-            "type": "TabularTranslator",
-            "mappings": [
-              {
-                "source": {
-                  "name": "freq",
-                  "type": "String",
-                  "physicalType": "STRING"
                 },
-                "sink": {
-                  "name": "freq",
-                  "physicalType": "string"
-                }
+                "firstRowOnly": true
               },
-              {
-                "source": {
-                  "name": "unit",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "unit",
-                  "physicalType": "string"
-                }
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
               },
-              {
-                "source": {
-                  "name": "nationality_code",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "nationality_code",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "sex",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "sex",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "age_group",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "age_group",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "decision",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "decision",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "country_code",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "country_code",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "time_period",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "time_period",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "decision_count",
-                  "type": "Int64",
-                  "physicalType": "INT64"
-                },
-                "sink": {
-                  "name": "decision_count",
-                  "physicalType": "long"
-                }
-              },
-              {
-                "source": {
-                  "name": "flag",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "flag",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "country_name",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "country_name",
-                  "physicalType": "string"
-                }
-              }
-            ],
-            "typeConversion": true,
-            "typeConversionSettings": {
-              "allowDataTruncation": true,
-              "treatBooleanAsNumber": false
-            }
-          },
-          "enableStaging": false
-        },
-        "policy": {
-          "timeout": "0.12:00:00",
-          "retry": 0,
-          "retryIntervalInSeconds": 30,
-          "secureInput": false,
-          "secureOutput": false
-        },
-        "name": "Copy asydcfstq data",
-        "dependsOn": [
-          {
-            "activity": "Copy asyappctzm data",
-            "dependencyConditions": [
-              "Succeeded"
-            ]
-          }
-        ]
-      },
-      {
-        "type": "Copy",
-        "typeProperties": {
-          "source": {
-            "type": "ParquetSource",
-            "storeSettings": {
-              "type": "AzureFileStorageReadSettings",
-              "recursive": false,
-              "enablePartitionDiscovery": false,
-              "maxConcurrentConnections": 0
+              "name": "Lookup_Azure_LastProcessedDate",
+              "dependsOn": []
             },
-            "formatSettings": {
-              "type": "ParquetReadSettings"
-            },
-            "datasetSettings": {
-              "type": "Parquet",
+            {
+              "type": "IfCondition",
               "typeProperties": {
-                "location": {
-                  "type": "AzureFileStorageLocation",
-                  "folderPath": "processed",
-                  "fileName": "migr_asypenctzm_chunked_processed.parquet"
+                "expression": {
+                  "value": "@greater(\n    ticks(activity('Lookup_Azure_LastProcessedDate').output.firstRow.Prop_0),\n    ticks(coalesce(item().last_imported_source_date, '0001-01-01T00:00:00Z'))\n)",
+                  "type": "Expression"
                 },
-                "compressionCodec": "snappy"
-              },
-              "schema": [],
-              "externalReferences": {
-                "connection": "1653845a-f0bb-4012-ba4e-847a29659c69"
-              },
-              "annotations": []
-            }
-          },
-          "sink": {
-            "type": "LakehouseTableSink",
-            "tableActionOption": "OverwriteSchema",
-            "applyVOrder": false,
-            "enableTimestampNtz": false,
-            "partitionOption": "None",
-            "datasetSettings": {
-              "type": "LakehouseTable",
-              "typeProperties": {
-                "schema": "bronze",
-                "table": "asypenctzm"
-              },
-              "schema": [],
-              "linkedService": {
-                "name": "Eurostat_Asylum_Lakehouse",
-                "properties": {
-                  "type": "Lakehouse",
-                  "typeProperties": {
-                    "artifactId": "eb88dcd3-bccc-8d6f-4b65-bc40a904ab17",
-                    "workspaceId": "00000000-0000-0000-0000-000000000000",
-                    "rootFolder": "Tables"
+                "ifTrueActivities": [
+                  {
+                    "type": "Copy",
+                    "typeProperties": {
+                      "source": {
+                        "type": "ParquetSource",
+                        "storeSettings": {
+                          "type": "AzureFileStorageReadSettings",
+                          "recursive": false,
+                          "enablePartitionDiscovery": false
+                        },
+                        "formatSettings": {
+                          "type": "ParquetReadSettings"
+                        },
+                        "datasetSettings": {
+                          "type": "Parquet",
+                          "typeProperties": {
+                            "location": {
+                              "type": "AzureFileStorageLocation",
+                              "folderPath": "processed",
+                              "fileName": {
+                                "value": "@concat(item().dataset_name, '_chunked_processed.parquet')",
+                                "type": "Expression"
+                              }
+                            },
+                            "compressionCodec": "snappy"
+                          },
+                          "schema": [],
+                          "externalReferences": {
+                            "connection": "1653845a-f0bb-4012-ba4e-847a29659c69"
+                          },
+                          "annotations": []
+                        }
+                      },
+                      "sink": {
+                        "type": "LakehouseTableSink",
+                        "tableActionOption": "OverwriteSchema",
+                        "applyVOrder": false,
+                        "enableTimestampNtz": false,
+                        "partitionOption": "None",
+                        "datasetSettings": {
+                          "type": "LakehouseTable",
+                          "typeProperties": {
+                            "schema": "bronze",
+                            "table": {
+                              "value": "@replace(item().dataset_name, 'migr_', '')",
+                              "type": "Expression"
+                            }
+                          },
+                          "schema": [],
+                          "linkedService": {
+                            "name": "Eurostat_Asylum_Lakehouse",
+                            "properties": {
+                              "type": "Lakehouse",
+                              "typeProperties": {
+                                "artifactId": "eb88dcd3-bccc-8d6f-4b65-bc40a904ab17",
+                                "workspaceId": "00000000-0000-0000-0000-000000000000",
+                                "rootFolder": "Tables"
+                              },
+                              "annotations": []
+                            }
+                          },
+                          "annotations": []
+                        }
+                      },
+                      "translator": {
+                        "type": "TabularTranslator",
+                        "typeConversion": true,
+                        "typeConversionSettings": {
+                          "allowDataTruncation": true,
+                          "treatBooleanAsNumber": false
+                        }
+                      },
+                      "enableStaging": false
+                    },
+                    "policy": {
+                      "timeout": "0.12:00:00",
+                      "retry": 0,
+                      "retryIntervalInSeconds": 30,
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "Copy data From_Azure_To_Fabric",
+                    "dependsOn": []
                   },
-                  "annotations": []
-                }
+                  {
+                    "type": "TridentNotebook",
+                    "typeProperties": {
+                      "notebookId": "33cf2f79-e7b0-a3d9-4d37-a861689cae74",
+                      "workspaceId": "00000000-0000-0000-0000-000000000000",
+                      "parameters": {
+                        "dataset_name": {
+                          "value": {
+                            "value": "@replace(item().dataset_name, 'migr_', '')",
+                            "type": "Expression"
+                          },
+                          "type": "string"
+                        },
+                        "source_date": {
+                          "value": {
+                            "value": "@activity('Lookup_Azure_LastProcessedDate').output.firstRow.Prop_0",
+                            "type": "Expression"
+                          },
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "policy": {
+                      "timeout": "0.12:00:00",
+                      "retry": 0,
+                      "retryIntervalInSeconds": 30,
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "Silver_Upsert_Notebook",
+                    "dependsOn": [
+                      {
+                        "activity": "Copy data From_Azure_To_Fabric",
+                        "dependencyConditions": [
+                          "Succeeded"
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "ifFalseActivities": []
               },
-              "annotations": []
+              "name": "If_Dataset_Updated",
+              "dependsOn": [
+                {
+                  "activity": "Lookup_Azure_LastProcessedDate",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
             }
-          },
-          "translator": {
-            "type": "TabularTranslator",
-            "mappings": [
-              {
-                "source": {
-                  "name": "freq",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "freq",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "unit",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "unit",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "nationality_code",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "nationality_code",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "sex",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "sex",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "age_group",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "age_group",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "country_code",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "country_code",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "time_period",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "time_period",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "pending_count",
-                  "type": "Int64",
-                  "physicalType": "INT64"
-                },
-                "sink": {
-                  "name": "pending_count",
-                  "physicalType": "long"
-                }
-              },
-              {
-                "source": {
-                  "name": "flag",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "flag",
-                  "physicalType": "string"
-                }
-              },
-              {
-                "source": {
-                  "name": "country_name",
-                  "type": "String",
-                  "physicalType": "STRING"
-                },
-                "sink": {
-                  "name": "country_name",
-                  "physicalType": "string"
-                }
-              }
-            ],
-            "typeConversion": true,
-            "typeConversionSettings": {
-              "allowDataTruncation": true,
-              "treatBooleanAsNumber": false
-            }
-          },
-          "enableStaging": false
+          ]
         },
-        "policy": {
-          "timeout": "0.12:00:00",
-          "retry": 0,
-          "retryIntervalInSeconds": 30,
-          "secureInput": false,
-          "secureOutput": false
-        },
-        "name": "Copy asypenctzm data",
+        "name": "Get_All_ProcessedDate_From_Azure",
         "dependsOn": [
           {
-            "activity": "Copy asydcfstq data",
+            "activity": "Fabric_Watermarks",
             "dependencyConditions": [
               "Succeeded"
             ]

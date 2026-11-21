@@ -20,16 +20,26 @@
 # META   }
 # META }
 
+# PARAMETERS CELL ********************
+
+dataset_name = "asyappctzm"
+source_date = ""
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
 # CELL ********************
 
-from pyspark.sql.functions import col, concat, lit, to_date
 from delta.tables import DeltaTable
+from pyspark.sql.functions import col, to_timestamp
+
 
 spark.sql("CREATE SCHEMA IF NOT EXISTS silver")
 
-df_bronze_asyappctzm = spark.table("bronze.asyappctzm")
-df_bronze_asydcfstq = spark.table("bronze.asydcfstq")
-df_bronze_asypenctzm = spark.table("bronze.asypenctzm")
 
 # METADATA ********************
 
@@ -40,27 +50,25 @@ df_bronze_asypenctzm = spark.table("bronze.asypenctzm")
 
 # CELL ********************
 
- ### asyappctzm UPSERT
-
-
-# If condtion to check if the silver table exists or not 
-if spark._jsparkSession.catalog().tableExists("silver.asyappctzm"):
-        
-    # Prepare target & source tables
-    source_asyappctzm = df_bronze_asyappctzm
-    target_asyappctzm = DeltaTable.forName(spark, "silver.asyappctzm")
-
-    # nationality_code, country_code, time_period, and applicant_type are the PK combination for this table
-    target_asyappctzm.alias("target_table").merge(source_asyappctzm.alias("source_table"), "target_table.nationality_code = source_table.nationality_code \
-    AND target_table.country_code = source_table.country_code AND target_table.time_period = source_table.time_period \
-    AND target_table.applicant_type = source_table.applicant_type ") \
-    .whenMatchedUpdateAll().whenNotMatchedInsertAll().execute()
-    print("Incremental load for asyappctzm completed successfully")
-else:
-    # If there is not silver table. Then, create a new one 
-    df_bronze_asyappctzm.write.format("delta").mode("overwrite").partitionBy("time_period") \
-    .saveAsTable("silver.asyappctzm")
-    print("Initial load for asyappctzm completed successfully")
+merge_keys = {
+    "asyappctzm": [
+        "nationality_code",
+        "country_code",
+        "time_period",
+        "applicant_type"
+    ],
+    "asydcfstq": [
+        "nationality_code",
+        "country_code",
+        "time_period",
+        "decision"
+    ],
+    "asypenctzm": [
+        "nationality_code",
+        "country_code",
+        "time_period"
+    ]
+}
 
 # METADATA ********************
 
@@ -71,27 +79,23 @@ else:
 
 # CELL ********************
 
- ### asydcfstq UPSERT
+# Validate dataset name
+if dataset_name not in merge_keys:
+    raise ValueError(f"Unsupported dataset: {dataset_name}")
 
+# Define target Silver table
+target_table_name = f"silver.{dataset_name}"
 
-# If condtion to check if the silver table exists or not 
-if spark._jsparkSession.catalog().tableExists("silver.asydcfstq"):
-        
-    # Prepare target & source tables
-    source_asydcfstq = df_bronze_asydcfstq
-    target_asydcfstq = DeltaTable.forName(spark, "silver.asydcfstq")
+# Get primary keys
+keys = merge_keys[dataset_name]
 
-    # nationality_code, decision, country_code, and time_period are the PK combination for this table
-    target_asydcfstq.alias("target_table").merge(source_asydcfstq.alias("source_table"), "target_table.nationality_code = source_table.nationality_code \
-    AND target_table.country_code = source_table.country_code AND target_table.time_period = source_table.time_period \
-    AND target_table.decision = source_table.decision ")\
-    .whenMatchedUpdateAll().whenNotMatchedInsertAll().execute()
-    print("Incremental load for asydcfstq completed successfully")
-else:
-    # If there is not silver table. Then, create a new one 
-    df_bronze_asydcfstq.write.format("delta").mode("overwrite").partitionBy("time_period") \
-    .saveAsTable("silver.asydcfstq")
-    print("Initial load for asydcfstq completed successfully")
+# Build dynamic merge condition
+merge_condition = " AND ".join(
+    [
+        f"target_table.`{key}` = source_table.`{key}`"
+        for key in keys
+    ]
+)
 
 # METADATA ********************
 
@@ -102,26 +106,167 @@ else:
 
 # CELL ********************
 
- ### asypenctzm UPSERT
+# Define the bronze source table
+df_bronze_dataset = spark.table(f"bronze.{dataset_name}")
 
+if df_bronze_dataset.limit(1).count() == 0:
+    raise ValueError(
+        f"Bronze table {dataset_name} is empty!"
+    )
 
-# If condtion to check if the silver table exists or not 
-if spark._jsparkSession.catalog().tableExists("silver.asypenctzm"):
-        
-    # Prepare target & source tables
-    source_asypenctzm = df_bronze_asypenctzm
-    target_asypenctzm = DeltaTable.forName(spark, "silver.asypenctzm")
+# METADATA ********************
 
-    # nationality_code, country_code, and time_period are the PK combination for this table
-    target_asypenctzm.alias("target_table").merge(source_asypenctzm.alias("source_table"), "target_table.nationality_code = source_table.nationality_code \
-    AND target_table.country_code = source_table.country_code AND target_table.time_period = source_table.time_period")\
-    .whenMatchedUpdateAll().whenNotMatchedInsertAll().execute()
-    print("Incremental load for asypenctzm completed successfully")
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+# Check if the Silver table exists
+if spark.catalog.tableExists(target_table_name):
+
+    target_table = DeltaTable.forName(
+        spark,
+        target_table_name
+    )
+
+    (
+        target_table.alias("target_table")
+        .merge(
+            df_bronze_dataset.alias("source_table"),
+            merge_condition
+        )
+        .whenMatchedUpdateAll()
+        .whenNotMatchedInsertAll()
+        .whenNotMatchedBySourceDelete()
+        .execute()
+    )
+
+    print(
+        f"Full snapshot synchronization for "
+        f"{dataset_name} completed successfully"
+    )
+
 else:
-    # If there is not silver table. Then, create a new one 
-    df_bronze_asypenctzm.write.format("delta").mode("overwrite").partitionBy("time_period") \
-    .saveAsTable("silver.asypenctzm")
-    print("Initial load for asypenctzm completed successfully")
+    (
+        df_bronze_dataset.write
+        .format("delta")
+        .mode("overwrite")
+        .partitionBy("time_period")
+        .saveAsTable(target_table_name)
+    )
+
+    print(
+        f"Initial load for {dataset_name} completed successfully"
+    )
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+
+
+# Validate source date
+if source_date is None or not source_date.strip():
+    raise ValueError("source_date parameter is missing.")
+
+# Convert Eurostat dataset ID to Watermark dataset name
+watermark_dataset_name = f"migr_{dataset_name}"
+
+# Prepare the new Watermark value
+watermark_update_df = (
+    spark.createDataFrame(
+        [(watermark_dataset_name, source_date)],
+        ["dataset_name", "source_date"]
+    )
+    .select(
+        col("dataset_name"),
+        to_timestamp(col("source_date")).alias(
+            "last_imported_source_date"
+        )
+    )
+)
+
+# Ensure the source date is valid
+if watermark_update_df.filter(
+    col("last_imported_source_date").isNull()
+).limit(1).count() > 0:
+    raise ValueError(f"Invalid source_date: {source_date}")
+
+# Ensure exactly one Watermark record exists
+matching_rows = (
+    spark.table("control.fabric_watermarks")
+    .filter(col("dataset_name") == watermark_dataset_name)
+    .count()
+)
+
+if matching_rows != 1:
+    raise ValueError(
+        f"Expected one Watermark record for "
+        f"{watermark_dataset_name}, found {matching_rows}"
+    )
+
+# Update Watermark after successful Silver synchronization
+watermark_update_df.createOrReplaceTempView(
+    "watermark_update"
+)
+
+spark.sql("""
+    MERGE INTO control.fabric_watermarks AS target
+    USING watermark_update AS source
+    ON target.dataset_name = source.dataset_name
+    WHEN MATCHED THEN UPDATE SET
+        target.last_imported_source_date =
+            source.last_imported_source_date
+""")
+
+print(
+    f"Watermark updated successfully for "
+    f"{watermark_dataset_name}: {source_date}"
+)
+
+# Verify the updated Watermark
+display(
+    spark.table("control.fabric_watermarks")
+    .filter(col("dataset_name") == watermark_dataset_name)
+)
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark"
+# META }
+
+# CELL ********************
+
+--
+%%sql
+UPDATE control.fabric_watermarks
+SET last_imported_source_date = TIMESTAMP '2026-10-28 10:00:00.000000'
+WHERE dataset_name = 'migr_asydcfstq';
+
+
+# METADATA ********************
+
+# META {
+# META   "language": "python",
+# META   "language_group": "synapse_pyspark",
+# META   "frozen": true,
+# META   "editable": false
+# META }
+
+# CELL ********************
+
+df = spark.sql("SELECT * FROM Eurostat_Asylum_Lakehouse.control.fabric_watermarks LIMIT 1000")
+display(df)
 
 # METADATA ********************
 
