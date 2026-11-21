@@ -1,0 +1,77 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "1321d68406a567028c8c",
+  "position": {
+    "x": 849.92817238627288,
+    "y": 22.740553107325027,
+    "z": 5000,
+    "height": 65.379090183559455,
+    "width": 389.43197196294108,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "slicer",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_asyappctzm"
+                    }
+                  },
+                  "Property": "nationality_code"
+                }
+              },
+              "queryRef": "fact_asyappctzm.nationality_code",
+              "nativeQueryRef": "nationality_code",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "data": [
+        {
+          "properties": {
+            "mode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Dropdown'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {}
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "e317b113a13ba050cdc3",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_asyappctzm"
+              }
+            },
+            "Property": "nationality_code"
+          }
+        },
+        "type": "Categorical"
+      }
+    ]
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "bae54d49270d2390382c",
+  "position": {
+    "x": 395.11711023977239,
+    "y": 95.226066136923549,
+    "z": 2000,
+    "height": 275.72920642631595,
+    "width": 403.64481765501927,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_asydcfstq"
+                    }
+                  },
+                  "Property": "Recognition Rate %"
+                }
+              },
+              "queryRef": "fact_asydcfstq.Recognition Rate %",
+              "nativeQueryRef": "Recognition Rate %"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "fact_asydcfstq"
+                  }
+                },
+                "Property": "Recognition Rate %"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "7df865f0b3ad0a8b5292",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_asydcfstq"
+              }
+            },
+            "Property": "Recognition Rate %"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}

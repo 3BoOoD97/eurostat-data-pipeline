@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "e3d88a46e1081b62d42d",
   "position": {
-    "x": 580.34620505992007,
-    "y": 191.74434087882821,
-    "z": 2,
+    "x": 960.49382716049377,
+    "y": 90.123456790123456,
+    "z": 2000,
     "height": 280,
     "width": 280,
-    "tabOrder": 2
+    "tabOrder": 2000
   },
   "visual": {
     "visualType": "cardVisual",
@@ -52,23 +52,5 @@
       }
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "e60e75053013000e73c6",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "fact_asypenctzm"
-              }
-            },
-            "Property": "Total Pending (Latest Month)"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }

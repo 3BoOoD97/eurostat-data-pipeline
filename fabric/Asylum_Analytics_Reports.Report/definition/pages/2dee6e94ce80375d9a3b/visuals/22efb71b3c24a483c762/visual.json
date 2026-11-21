@@ -1,0 +1,75 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "22efb71b3c24a483c762",
+  "position": {
+    "x": 849.92817238627288,
+    "y": 96.647350706131363,
+    "z": 0,
+    "height": 274.30792185710817,
+    "width": 389.43197196294108,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_asydcfstq"
+                    }
+                  },
+                  "Property": "Total Decisions (Page 3)"
+                }
+              },
+              "queryRef": "fact_asydcfstq.Total Decisions (Page 3)",
+              "nativeQueryRef": "Total Decisions ",
+              "displayName": "Total Decisions "
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "fact_asydcfstq"
+                  }
+                },
+                "Property": "Total Decisions (Page 3)"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "050c5114042a1027d961",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_asydcfstq"
+              }
+            },
+            "Property": "Total Decisions (Page 3)"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}

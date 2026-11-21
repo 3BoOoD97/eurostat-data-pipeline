@@ -1,0 +1,74 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "10ef45ac03d07812cd25",
+  "position": {
+    "x": 58.272667337520382,
+    "y": 95.226066136923549,
+    "z": 1000,
+    "height": 275.72920642631595,
+    "width": 299.89104410284881,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_asydcfstq"
+                    }
+                  },
+                  "Property": "Positive Decisions"
+                }
+              },
+              "queryRef": "fact_asydcfstq.Positive Decisions",
+              "nativeQueryRef": "Positive Decisions"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "fact_asydcfstq"
+                  }
+                },
+                "Property": "Positive Decisions"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "4cb23e93b2ab257c2db5",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_asydcfstq"
+              }
+            },
+            "Property": "Positive Decisions"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}
