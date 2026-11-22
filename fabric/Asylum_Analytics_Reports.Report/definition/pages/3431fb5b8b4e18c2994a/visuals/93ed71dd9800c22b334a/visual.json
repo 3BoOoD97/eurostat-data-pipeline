@@ -2,8 +2,8 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "93ed71dd9800c22b334a",
   "position": {
-    "x": 1349.8801597869506,
-    "y": 191.74434087882821,
+    "x": 1629.6296296296296,
+    "y": 92.592592592592581,
     "z": 0,
     "height": 280,
     "width": 280,
@@ -52,23 +52,5 @@
       }
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "56ac9a264a4ead885899",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "fact_asyappctzm"
-              }
-            },
-            "Property": "Total Applications (TOTAL)"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }

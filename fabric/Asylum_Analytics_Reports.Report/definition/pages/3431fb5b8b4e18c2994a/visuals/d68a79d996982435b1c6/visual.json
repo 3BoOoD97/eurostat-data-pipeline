@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "d68a79d996982435b1c6",
   "position": {
-    "x": 998.34886817576557,
-    "y": 191.74434087882821,
-    "z": 1,
+    "x": 1296.2962962962963,
+    "y": 91.358024691358025,
+    "z": 1000,
     "height": 280,
     "width": 280,
-    "tabOrder": 1
+    "tabOrder": 1000
   },
   "visual": {
     "visualType": "cardVisual",
@@ -52,23 +52,5 @@
       }
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "7498d09e0e046adc9095",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "fact_asydcfstq"
-              }
-            },
-            "Property": "Total Decisions (TOTAL)"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }
