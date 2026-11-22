@@ -30,13 +30,44 @@ The resulting datasets will enable country-level comparisons against the EU27 ag
 ## Architecture
 
 ### Local Architecture
-The local pipeline uses Docker containers for extraction and transformation, with Airflow orchestrating the tasks and their dependencies
+The local setup uses two Docker containers to keep data extraction and transformation separate. Apache Airflow is responsible for coordinating the tasks and deciding when each container should run.
 
+The first container, eurostat-extract, connects to the Eurostat API, checks for updates using dataset metadata, and downloads the raw data when a newer version is available. It also saves the latest download date and returns an update status to Airflow.
+
+Based on this status, Airflow checks whether new data is available or whether the processed output is missing. If an update is needed, it triggers the second container, eurostat-transform.
+
+The transformation container reads the raw dataset, cleans the data, reshapes it from wide to long format, validates the output, and saves the processed data in CSV or Parquet format.
 ![Current-State Architecture](docs/current_local_architecture.jpeg)
 
-### Azure Architecture
-...
 
+### Local ETL Processing Flow
+The eurostat-extract container connects to the Eurostat API and checks the latest dataset update date using its metadata. It compares this date with the locally stored last_download_date to determine whether new data needs to be downloaded. When an update is available, the raw dataset is downloaded and stored locally.
+
+Apache Airflow orchestrates the two containers and manages their execution order. After extraction, it checks whether an update was found or whether the processed output is missing. If either condition is met, it triggers the eurostat-transform container.
+
+The transformation process reads the raw data in chunks rather than loading the entire dataset into memory. Each chunk is cleaned, transformed, validated, and then saved incrementally to Parquet. Once the full transformation finishes successfully, the last_processed_date marker is updated.
+
+![Local_ETL_Processing_Flow](docs/Local%20ETL%20Processing%20Flow.png)
+
+### Azure Architecture
+After getting the pipeline working locally, I moved it to Azure so it could run automatically without depending on my local machine.
+
+For this setup, I combined the extraction and transformation code into one Docker image instead of using two separate containers. I pushed the image to GitHub Container Registry (GHCR), and Azure Container Apps Job pulls it and runs the pipeline every Sunday.
+
+The pipeline follows the same process as the local version. It checks Eurostat for new data, downloads any updates, and processes the datasets in chunks. Each chunk is cleaned and validated before being saved to Parquet.
+
+I also set up an Azure Storage Account with an Azure File Share to store the pipeline's files. The file share is mounted inside the container, so raw data, processed Parquet files, and date markers are kept between runs rather than being lost when the container stops.
+
+To keep track of executions, I configured Azure Monitor alerts and Log Analytics. If the job enters an unexpected state that matches the alert conditions, an email notification is sent through an Action Group.
+
+Once the Parquet files are ready, Microsoft Fabric picks them up from Azure Files and continues the process through the Bronze, Silver, and Gold layers. The resulting Gold tables are then used by the Power BI semantic model.
+
+![Local_ETL_Processing_Flow](docs/Azure%20Cloud%20Architecture.png)
+
+**The goal was mainly to learn how to deploy and run the pipeline in the cloud, rather than redesign it for maximum scalability. The current version still processes chunks sequentially inside one container. This works for the current datasets, but a distributed solution like Spark would be more suitable for larger workloads. So, future improvements will use distributed processing with Apache Spark and temporary Parquet files to improve scalability and protect existing output when a processing run fails.**
+
+
+### Fabric Architecture
 ---
 
 ## Pipeline Flow
@@ -104,7 +135,6 @@ The local Docker and Airflow pipeline has been tested successfully with the foll
 - Standalone Docker container execution
 - Airflow DAG execution for all configured datasets
 
-The local pipeline is stable for local execution. The next step is to implement and test cloud storage integration.
 
 ---
 
